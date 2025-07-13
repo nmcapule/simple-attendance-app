@@ -1,11 +1,11 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 from deepface import DeepFace
 import os
 import sqlite3
 
 app = Flask(__name__, template_folder="src/templates", static_folder="src/static")
-app.config["UPLOAD_FOLDER"] = "uploads"
-DATABASE = "attendance.db"
+app.config["UPLOAD_FOLDER"] = os.environ.get("UPLOAD_FOLDER", "data/uploads")
+DATABASE = os.environ.get("DATABASE", "data/attendance.db")
 
 
 def get_db():
@@ -142,30 +142,50 @@ def register_employee():
 
 @app.route("/result")
 def result():
-    # Accept query params for status, employee_id, message, loading
+    # Accept query params for status, employee_id, nickname, message, loading
     status = request.args.get("status")
     employee_id = request.args.get("employee_id")
+    nickname = request.args.get("nickname")
     message = request.args.get("message")
     loading = request.args.get("loading") == "true"
 
-    nickname = None
+    attendance_entries = []
+    emp_id = None
     if employee_id:
+        emp_id = employee_id
+    elif nickname:
         conn = get_db()
         c = conn.cursor()
-        c.execute("SELECT nickname FROM employees WHERE id = ?", (employee_id,))
+        c.execute("SELECT id FROM employees WHERE nickname = ?", (nickname,))
         row = c.fetchone()
         if row:
-            nickname = row["nickname"]
+            emp_id = row["id"]
+        conn.close()
+    if emp_id:
+        conn = get_db()
+        c = conn.cursor()
+        c.execute(
+            "SELECT timestamp, image_path FROM attendance WHERE employee_id = ? ORDER BY timestamp DESC LIMIT 10",
+            (emp_id,),
+        )
+        attendance_entries = c.fetchall()
         conn.close()
 
     return render_template(
         "result.html",
         status=status,
-        employee_id=employee_id,
+        employee_id=emp_id,
         nickname=nickname,
         message=message,
         loading=loading,
+        attendance_entries=attendance_entries,
     )
+
+
+# Serve uploaded images
+@app.route("/uploads/<path:filename>")
+def uploaded_file(filename):
+    return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
 
 
 if __name__ == "__main__":

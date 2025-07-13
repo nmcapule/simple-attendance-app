@@ -64,6 +64,44 @@
       >
         Submit Another Attendance
       </button>
+
+      {% if attendance_entries and attendance_entries|length > 0 %}
+      <h3 style="margin-top: 32px; margin-bottom: 12px">
+        Last 10 Attendance Entries
+      </h3>
+      <table
+        style="
+          width: 100%;
+          max-width: 400px;
+          background: #222;
+          border-radius: 8px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+          margin-bottom: 24px;
+        "
+      >
+        <thead>
+          <tr style="background: #333; color: #fff">
+            <th style="padding: 8px 12px; text-align: left">Timestamp</th>
+            <th style="padding: 8px 12px; text-align: left">Image</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in attendance_entries %}
+          <tr style="background: #222; color: #fff">
+            <td style="padding: 8px 12px">{{ entry['timestamp'] }}</td>
+            <td style="padding: 8px 12px">
+              <a
+                href="/{{ entry['image_path'] }}"
+                target="_blank"
+                style="color: #4caf50; text-decoration: underline"
+                >View</a
+              >
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
     </div>
   </body>
 </html>
