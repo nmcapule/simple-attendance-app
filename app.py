@@ -197,4 +197,5 @@ if __name__ == "__main__":
         for root, dirs, files in os.walk(folder):
             for f in files:
                 extra_files.append(os.path.join(root, f))
-    app.run(debug=True, extra_files=extra_files)
+    port = int(os.environ.get("PORT", 8080))
+    app.run(debug=True, extra_files=extra_files, host="0.0.0.0", port=port)
