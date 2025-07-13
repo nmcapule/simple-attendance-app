@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Attendance Result</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <style>
+      body {
+        background: #000;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+      }
+      .result-box {
+        background: rgba(0, 0, 0, 0.8);
+        padding: 32px 24px;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        text-align: center;
+        font-size: 1.3em;
+        min-width: 260px;
+      }
+      .loading {
+        font-size: 1.2em;
+        color: #aaa;
+      }
+      .success {
+        color: #4caf50;
+      }
+      .fail {
+        color: #f44336;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="result-box">
+      {% if status == 'success' %}
+      <div class="success">
+        Attendance submitted!<br />Nickname: {{ nickname }}
+      </div>
+      {% elif status == 'fail' %}
+      <div class="fail">{{ message }}</div>
+      {% endif %}
+      <button
+        onclick="window.location.href='/'"
+        style="
+          margin-top: 24px;
+          padding: 12px 32px;
+          font-size: 1em;
+          border-radius: 8px;
+          border: none;
+          background: #007bff;
+          color: #fff;
+          cursor: pointer;
+        "
+      >
+        Submit Another Attendance
+      </button>
+    </div>
+  </body>
+</html>
